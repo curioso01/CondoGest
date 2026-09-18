@@ -22,20 +22,78 @@ interface ReservasViewProps {
   onOpenBooking: (space: SpaceOption) => void;
 }
 
+const MONTH_NAMES = [
+  'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+  'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+];
+
 export const ReservasView: React.FC<ReservasViewProps> = ({ onOpenBooking }) => {
   const { reservations, cancelReservation, updateReservationGuests, currentUser, showToast } = useCondo();
   const [selectedSpaceFilter, setSelectedSpaceFilter] = useState<string>('all');
-  const [selectedMonth, setSelectedMonth] = useState<'maio' | 'junho'>('maio');
 
-  // Days simulation for calendar view
-  const daysInMay = Array.from({ length: 31 }, (_, i) => i + 1);
+  // Calendar navigation state — starts on the current month
+  const today = new Date();
+  const [calendarDate, setCalendarDate] = useState(
+    new Date(today.getFullYear(), today.getMonth(), 1)
+  );
 
-  // Status mapping for days in May
+  const currentMonth = calendarDate.getMonth();
+  const currentYear = calendarDate.getFullYear();
+
+  const goToPrevMonth = () =>
+    setCalendarDate(new Date(currentYear, currentMonth - 1, 1));
+
+  const goToNextMonth = () =>
+    setCalendarDate(new Date(currentYear, currentMonth + 1, 1));
+
+  // Days in the displayed month
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  // Day-of-week offset so day 1 lands on the correct column (0 = Sunday)
+  const firstDayOffset = new Date(currentYear, currentMonth, 1).getDay();
+  const offsetBoxes = Array.from({ length: firstDayOffset });
+
+  // Build a Set of reserved days from real reservation data for the displayed month
+  const reservedDays = new Set<number>();
+  const partialDays = new Set<number>();
+
+  reservations.forEach((res) => {
+    // res.date is expected to be a string like "dd/mm/yyyy" or "yyyy-mm-dd"
+    // Try to parse whichever format is used
+    let resDate: Date | null = null;
+    if (res.date) {
+      // Try ISO format first
+      if (/^\d{4}-\d{2}-\d{2}/.test(res.date)) {
+        resDate = new Date(res.date);
+      } else if (/^\d{2}\/\d{2}\/\d{4}/.test(res.date)) {
+        // BR format dd/mm/yyyy
+        const [d, m, y] = res.date.split('/');
+        resDate = new Date(Number(y), Number(m) - 1, Number(d));
+      }
+    }
+
+    if (resDate && resDate.getMonth() === currentMonth && resDate.getFullYear() === currentYear) {
+      const day = resDate.getDate();
+      if (reservedDays.has(day)) {
+        // Already marked as reserved — stays reserved
+      } else if (partialDays.has(day)) {
+        // Second reservation on same day → fully reserved
+        reservedDays.add(day);
+        partialDays.delete(day);
+      } else {
+        partialDays.add(day);
+      }
+    }
+  });
+
   const getDayStatus = (day: number) => {
-    if (day === 18) return { status: 'occupied', label: '3 Reservas (Sábado)', color: 'bg-rose-500' };
-    if (day === 24) return { status: 'partial', label: '1 Reserva (Salão)', color: 'bg-amber-500' };
-    if (day === 25) return { status: 'occupied', label: 'Churrasqueira 01', color: 'bg-rose-500' };
-    if (day === 31) return { status: 'partial', label: 'Churrasqueira 02', color: 'bg-amber-500' };
+    if (reservedDays.has(day)) {
+      return { status: 'occupied', label: 'Reservado', color: 'bg-rose-500' };
+    }
+    if (partialDays.has(day)) {
+      return { status: 'partial', label: 'Parcial', color: 'bg-amber-500' };
+    }
     return { status: 'free', label: 'Livre', color: 'bg-emerald-500' };
   };
 
@@ -197,12 +255,12 @@ export const ReservasView: React.FC<ReservasViewProps> = ({ onOpenBooking }) => 
         </div>
       </div>
 
-      {/* Visão do Calendário Bimestral Interativo */}
+      {/* Calendário de Disponibilidade */}
       <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5 lg:p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#eff4ff]">
           <div>
             <h3 className="font-extrabold text-base text-[#0b1c30]">
-              Disponibilidade em Tempo Real • Maio / 2025
+              Disponibilidade em Tempo Real
             </h3>
             <p className="text-xs text-[#76777d]">
               Selecione uma data para verificar os horários e abrir agendamento direto
@@ -226,6 +284,29 @@ export const ReservasView: React.FC<ReservasViewProps> = ({ onOpenBooking }) => 
           </div>
         </div>
 
+        {/* Month navigation */}
+        <div className="flex items-center justify-between">
+          <button
+            onClick={goToPrevMonth}
+            className="p-2 rounded-xl border border-[#e2e8f0] hover:bg-[#eff4ff] hover:border-[#006a61]/30 transition-all"
+            aria-label="Mês anterior"
+          >
+            <ChevronLeft className="w-4 h-4 text-[#0b1c30]" />
+          </button>
+
+          <span className="font-extrabold text-sm text-[#0b1c30]">
+            {MONTH_NAMES[currentMonth]} / {currentYear}
+          </span>
+
+          <button
+            onClick={goToNextMonth}
+            className="p-2 rounded-xl border border-[#e2e8f0] hover:bg-[#eff4ff] hover:border-[#006a61]/30 transition-all"
+            aria-label="Próximo mês"
+          >
+            <ChevronRight className="w-4 h-4 text-[#0b1c30]" />
+          </button>
+        </div>
+
         {/* Days Grid */}
         <div className="grid grid-cols-7 gap-1.5 sm:gap-2 text-center">
           {['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map((day) => (
@@ -234,13 +315,12 @@ export const ReservasView: React.FC<ReservasViewProps> = ({ onOpenBooking }) => 
             </div>
           ))}
 
-          {/* Offset for May 2025 (starts on Thursday = 4 empty boxes) */}
-          <div className="p-2" />
-          <div className="p-2" />
-          <div className="p-2" />
-          <div className="p-2" />
+          {/* Dynamic offset so day 1 starts on the correct weekday */}
+          {offsetBoxes.map((_, idx) => (
+            <div key={`offset-${idx}`} className="p-2" />
+          ))}
 
-          {daysInMay.map((day) => {
+          {daysArray.map((day) => {
             const info = getDayStatus(day);
             const isClickable = info.status !== 'occupied';
 
@@ -251,7 +331,10 @@ export const ReservasView: React.FC<ReservasViewProps> = ({ onOpenBooking }) => 
                   if (isClickable) {
                     onOpenBooking(SPACES[0]);
                   } else {
-                    showToast(`Dia ${day} de Maio já possui ocupação máxima nas áreas comuns.`, 'info');
+                    showToast(
+                      `Dia ${day} de ${MONTH_NAMES[currentMonth]} já possui ocupação máxima nas áreas comuns.`,
+                      'info'
+                    );
                   }
                 }}
                 className={`p-2 sm:p-3 rounded-xl border flex flex-col items-center justify-between transition-all min-h-[56px] sm:min-h-[70px] ${
