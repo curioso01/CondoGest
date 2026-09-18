@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#006a61" />
+      <stop offset="60%" stop-color="#004f48" />
+      <stop offset="100%" stop-color="#0b1c30" />
+    </linearGradient>
+    <linearGradient id="towerGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#e0f2fe" />
+    </linearGradient>
+    <linearGradient id="towerGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#86f2e4" />
+      <stop offset="100%" stop-color="#2dd4bf" />
+    </linearGradient>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a" />
+      <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="softShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000000" flood-opacity="0.3" />
+    </filter>
+  </defs>
+
+  <!-- Background Rounded Shield / Squircle -->
+  <rect width="128" height="128" rx="28" fill="url(#bgGrad)" />
+
+  <!-- Inner Stroke Highlight -->
+  <rect x="2" y="2" width="124" height="124" rx="26" fill="none" stroke="#86f2e4" stroke-width="1.5" stroke-opacity="0.3" />
+
+  <!-- Solar Orb ("Solar das Palmeiras") -->
+  <circle cx="86" cy="36" r="14" fill="url(#sunGrad)" />
+  <circle cx="86" cy="36" r="18" stroke="#fef08a" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.6" />
+
+  <!-- Secondary High-rise Tower (Right) -->
+  <path d="M72 44C72 42.8954 72.8954 42 74 42H94C95.1046 42 96 42.8954 96 44V96H72V44Z" fill="#033d37" opacity="0.9" />
+  <!-- Secondary Tower Windows -->
+  <rect x="76" y="48" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="84" y="48" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="76" y="57" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="84" y="57" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="76" y="66" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="84" y="66" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="76" y="75" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="84" y="75" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="76" y="84" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+  <rect x="84" y="84" width="4" height="5" rx="1" fill="#86f2e4" opacity="0.75" />
+
+  <!-- Main Residential Tower (Left/Center) -->
+  <g filter="url(#softShadow)">
+    <path d="M34 30C34 27.7909 35.7909 26 38 26H64C66.2091 26 68 27.7909 68 30V96H34V30Z" fill="url(#towerGrad1)" />
+
+    <!-- Modern Angled Penthouse Roofline -->
+    <path d="M34 30L48 20L68 26V30H34Z" fill="#86f2e4" />
+
+    <!-- Main Tower Window Arrays -->
+    <rect x="40" y="35" width="6" height="7" rx="1.5" fill="#006a61" />
+    <rect x="50" y="35" width="6" height="7" rx="1.5" fill="#006a61" />
+    <rect x="59" y="35" width="3.5" height="7" rx="1" fill="#006a61" opacity="0.7" />
+
+    <rect x="40" y="46" width="6" height="7" rx="1.5" fill="#006a61" />
+    <rect x="50" y="46" width="6" height="7" rx="1.5" fill="#006a61" />
+    <rect x="59" y="46" width="3.5" height="7" rx="1" fill="#006a61" opacity="0.7" />
+
+    <rect x="40" y="57" width="6" height="7" rx="1.5" fill="#006a61" />
+    <rect x="50" y="57" width="6" height="7" rx="1.5" fill="#006a61" />
+    <rect x="59" y="57" width="3.5" height="7" rx="1" fill="#006a61" opacity="0.7" />
+
+    <rect x="40" y="68" width="6" height="7" rx="1.5" fill="#006a61" />
+    <rect x="50" y="68" width="6" height="7" rx="1.5" fill="#006a61" />
+    <rect x="59" y="68" width="3.5" height="7" rx="1" fill="#006a61" opacity="0.7" />
+
+    <!-- Ground Level Entrance Lobby -->
+    <path d="M46 84H56V96H46V84Z" fill="#004842" />
+    <rect x="49" y="87" width="4" height="9" fill="#86f2e4" />
+  </g>
+
+  <!-- Modern Front Pavilion / Clubhouse -->
+  <path d="M60 65C60 63.8954 60.8954 63 62 63H94C95.1046 63 96 63.8954 96 65V96H60V65Z" fill="url(#towerGrad2)" opacity="0.95" />
+  <line x1="60" y1="71" x2="96" y2="71" stroke="#004842" stroke-width="1.5" />
+  <line x1="60" y1="79" x2="96" y2="79" stroke="#004842" stroke-width="1.5" />
+  <line x1="60" y1="87" x2="96" y2="87" stroke="#004842" stroke-width="1.5" />
+  <rect x="74" y="74" width="8" height="22" rx="1" fill="#004842" />
+
+  <!-- Horizon Base Accent -->
+  <rect x="26" y="96" width="76" height="4" rx="2" fill="#86f2e4" />
+</svg>

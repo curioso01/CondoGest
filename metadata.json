@@ -1,0 +1,6 @@
+{
+  "name": "CondoGest - Portal Residencial",
+  "description": "Sistema integrado de governança condominial web e mobile com portal do morador, gestão de reservas, financeiro PIX e painel administrativo de superuser para o síndico.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
