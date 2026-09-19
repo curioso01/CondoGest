@@ -25,7 +25,8 @@ export const Header: React.FC = () => {
     setDeviceMode,
     notices,
     setActiveTab,
-    setSelectedNotice
+    setSelectedNotice,
+    showToast
   } = useCondo();
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -44,6 +45,12 @@ export const Header: React.FC = () => {
               type="text"
               value={globalSearch}
               onChange={(e) => setGlobalSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.currentTarget.blur();
+                  showToast('Resultados filtrados instantaneamente na tela atual.', 'info');
+                }
+              }}
               placeholder="Buscar comunicados, moradores, reservas ou boletos..."
               className="w-full h-10 pl-10 pr-4 bg-[#eff4ff] rounded-lg font-body-sm text-sm text-[#0b1c30] placeholder:text-[#76777d] focus:outline-none focus:ring-2 focus:ring-[#006a61]/30 transition-all"
             />
