@@ -132,6 +132,19 @@ export const CondoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [users, notices, reservations, boletos, rules, currentUser]);
 
+  // Listen for storage events (sync between tabs)
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === `${STORAGE_KEY}_notices` && e.newValue) {
+        try {
+          setNotices(JSON.parse(e.newValue));
+        } catch {}
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   const showToast = (message: string, type: 'success' | 'info' | 'error' = 'success') => {
     setToast({ message, type });
     setTimeout(() => {

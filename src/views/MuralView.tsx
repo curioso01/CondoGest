@@ -56,11 +56,24 @@ export const MuralView: React.FC<MuralViewProps> = ({
 
   // Filter notices
   const filteredNotices = notices.filter(n => {
+    // 1. Filter by category
     const matchesCat = selectedCategory === 'Todos' || n.category === selectedCategory;
+    
+    // 2. Filter by search
     const matchesSearch = !globalSearch || 
       n.title.toLowerCase().includes(globalSearch.toLowerCase()) || 
       n.body.toLowerCase().includes(globalSearch.toLowerCase());
-    return matchesCat && matchesSearch;
+      
+    // 3. Filter by Audience (only show if it matches 'Todos', 'Todos os Blocos', or the user's block)
+    const isTargetedToUser = !currentUser || 
+      n.targetAudience === 'Todos' || 
+      n.targetAudience === 'Todos os Blocos (A, B e C)' || 
+      (currentUser.block && n.targetAudience.includes(currentUser.block));
+      
+    // 4. Filter by mural visibility flag (defaults to true if not present)
+    const isVisibleOnMural = !n.channels || n.channels.mural !== false;
+    
+    return matchesCat && matchesSearch && isTargetedToUser && isVisibleOnMural;
   });
 
   return (
@@ -318,7 +331,7 @@ export const MuralView: React.FC<MuralViewProps> = ({
 
           {/* Category Filter Pills */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-            {['Todos', 'Urgente', 'Regimento', 'Convocação', 'Manutenção'].map((cat) => (
+            {['Todos', 'Urgente', 'Regimento', 'Convocação', 'Manutenção', 'Festas'].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}

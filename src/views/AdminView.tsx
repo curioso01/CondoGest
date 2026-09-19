@@ -43,7 +43,8 @@ export const AdminView: React.FC = () => {
     rules, 
     updateRules, 
     showToast,
-    deviceMode
+    deviceMode,
+    setActiveTab
   } = useCondo();
 
   const isMobile = deviceMode === 'mobile';
@@ -201,6 +202,9 @@ export const AdminView: React.FC = () => {
 
     setNoticeTitle('');
     setNoticeBody('');
+    
+    // Auto redirect back to the Mural to see the new notice
+    setActiveTab('inicio');
   };
 
   const handleSaveRules = (e: React.FormEvent) => {
