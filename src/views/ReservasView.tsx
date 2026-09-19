@@ -268,7 +268,7 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
             </span>
 
             <span className="text-[#45464d]">
-              Seg a Sex até 22h00 | Sáb e Dom até 00h00.
+              Dom a Qui das 7h às 22h | Sex e Sáb das 7h às 00h.
             </span>
           </div>
 
