@@ -144,54 +144,49 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
   });
 
   // Build Sets of reserved days from real reservation data.
-  const reservedDays = new Set<number>();
-  const partialDays = new Set<number>();
-
-  reservations.forEach((res) => {
-    const resDate = parseLocalDate(res.date);
-
-    if (
-      resDate &&
-      resDate.getMonth() === currentMonth &&
-      resDate.getFullYear() === currentYear
-    ) {
-      const day = resDate.getDate();
-
-      if (reservedDays.has(day)) {
-        // Already fully reserved.
-      } else if (partialDays.has(day)) {
-        // Second reservation on same day -> fully reserved.
-        reservedDays.add(day);
-        partialDays.delete(day);
-      } else {
-        // First reservation on this day.
-        partialDays.add(day);
-      }
-    }
-  });
-
   const getDayStatus = (day: number) => {
-    if (reservedDays.has(day)) {
-      return {
-        status: 'occupied',
-        label: 'Reservado',
-        color: 'bg-rose-500'
-      };
+    const dateStr = formatDateForInput(currentYear, currentMonth, day);
+    const dayRes = reservations.filter(r => r.date === dateStr && r.status !== 'Cancelado');
+    
+    if (dayRes.length === 0) {
+      return { status: 'free', label: 'Livre', color: 'bg-emerald-500' };
     }
 
-    if (partialDays.has(day)) {
-      return {
-        status: 'partial',
-        label: 'Parcial',
-        color: 'bg-amber-500'
-      };
-    }
-
-    return {
-      status: 'free',
-      label: 'Livre',
-      color: 'bg-emerald-500'
+    const parseTime = (timeStr: string) => {
+      const [h, m] = timeStr.split(':').map(String);
+      return parseInt(h, 10) + (parseInt(m, 10) / 60);
     };
+
+    let totalReservedHours = 0;
+    SPACES.forEach(space => {
+      const spaceRes = dayRes.filter(r => r.spaceName === space.name);
+      let intervals = spaceRes.map(r => [parseTime(r.startTime), parseTime(r.endTime)]);
+      intervals.sort((a, b) => a[0] - b[0]);
+      let merged: number[][] = [];
+      if (intervals.length > 0) {
+        let current = intervals[0];
+        for (let i = 1; i < intervals.length; i++) {
+          if (intervals[i][0] <= current[1]) {
+            current[1] = Math.max(current[1], intervals[i][1]);
+          } else {
+            merged.push(current);
+            current = intervals[i];
+          }
+        }
+        merged.push(current);
+      }
+      for (let interval of merged) {
+        totalReservedHours += (interval[1] - interval[0]);
+      }
+    });
+
+    const isOccupied = totalReservedHours >= (SPACES.length * 10);
+
+    if (isOccupied) {
+      return { status: 'occupied', label: 'Reservado', color: 'bg-rose-500' };
+    }
+    
+    return { status: 'partial', label: 'Parcial', color: 'bg-amber-500' };
   };
 
   const filteredSpaces =
@@ -375,7 +370,15 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
               <div className="p-5 pt-0 mt-2 flex items-center justify-between border-t border-[#eff4ff]">
                 <div className="flex items-center gap-1.5 text-xs text-[#76777d]">
                   <Clock className="w-3.5 h-3.5 text-[#006a61]" />
-                  <span>{space.nextSlot}</span>
+                  <span>
+                    {(() => {
+                      const todayStr = formatDateForInput(today.getFullYear(), today.getMonth(), today.getDate());
+                      const resToday = reservations.filter(r => r.date === todayStr && r.spaceName === space.name && r.status !== 'Cancelado');
+                      if (resToday.length === 0) return 'Disponível Hoje';
+                      if (resToday.length === 1) return `Reservada das ${resToday[0].startTime} às ${resToday[0].endTime}`;
+                      return `Parcialmente ocupada (${resToday.length} reservas)`;
+                    })()}
+                  </span>
                 </div>
 
                 <button

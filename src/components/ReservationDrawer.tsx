@@ -72,7 +72,9 @@ export const ReservationDrawer: React.FC<
 }) => {
   const {
     currentUser,
-    addReservation
+    addReservation,
+    reservations,
+    showToast
   } = useCondo();
 
   /**
@@ -162,6 +164,47 @@ export const ReservationDrawer: React.FC<
     e.preventDefault();
 
     if (isOverDuration) {
+      return;
+    }
+
+    const parseTime = (timeStr: string) => {
+      const [h, m] = timeStr.split(':').map(Number);
+      return h + (m / 60);
+    };
+
+    const getConflictingReservation = (targetSpace: string) => {
+      const newStart = parseTime(startTime);
+      const newEnd = parseTime(endTime);
+      
+      return reservations.find(r => {
+        if (r.date === date && r.spaceName === targetSpace && r.status !== 'Cancelado') {
+          const rStart = parseTime(r.startTime);
+          const rEnd = parseTime(r.endTime);
+          return (newStart < rEnd && newEnd > rStart);
+        }
+        return false;
+      });
+    };
+
+    const conflict = getConflictingReservation(space.name);
+    if (conflict) {
+      let altMsg = `e só pode ser reservada a partir das ${conflict.endTime}`;
+      
+      if (space.id === 'churrasqueira-1') {
+        const altSpaceName = 'Churrasqueira 02 (Deck Sul)';
+        const altConflict = getConflictingReservation(altSpaceName);
+        if (!altConflict) {
+          altMsg += `, ou você pode escolher a ${altSpaceName} que está disponível neste horário`;
+        }
+      } else if (space.id === 'churrasqueira-2') {
+        const altSpaceName = 'Churrasqueira 01 (Gourmet Norte)';
+        const altConflict = getConflictingReservation(altSpaceName);
+        if (!altConflict) {
+          altMsg += `, ou você pode escolher a ${altSpaceName} que está disponível neste horário`;
+        }
+      }
+      
+      showToast(`${space.name} já possui uma reserva das ${conflict.startTime} às ${conflict.endTime} ${altMsg}.`, 'error');
       return;
     }
 
