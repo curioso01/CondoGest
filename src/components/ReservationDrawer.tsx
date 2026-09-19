@@ -23,6 +23,7 @@ interface ReservationDrawerProps {
    * 2026-09-30
    */
   selectedDate?: string;
+  editingReservation?: import('../types').Reservation | null;
 }
 
 /**
@@ -68,11 +69,13 @@ export const ReservationDrawer: React.FC<
 > = ({
   space,
   onClose,
-  selectedDate
+  selectedDate,
+  editingReservation
 }) => {
   const {
     currentUser,
     addReservation,
+    updateReservation,
     reservations,
     showToast
   } = useCondo();
@@ -100,6 +103,16 @@ export const ReservationDrawer: React.FC<
 
   const [notes, setNotes] =
     useState('');
+
+  React.useEffect(() => {
+    if (editingReservation) {
+      setDate(editingReservation.date);
+      setStartTime(editingReservation.startTime);
+      setEndTime(editingReservation.endTime);
+      setGuestsCount(editingReservation.guestsCount);
+      setNotes(editingReservation.notes || '');
+    }
+  }, [editingReservation]);
 
   if (!space) return null;
 
@@ -177,7 +190,12 @@ export const ReservationDrawer: React.FC<
       const newEnd = parseTime(endTime);
       
       return reservations.find(r => {
-        if (r.date === date && r.spaceName === targetSpace && r.status !== 'Cancelado') {
+        if (
+          r.id !== editingReservation?.id &&
+          r.date === date && 
+          r.spaceName === targetSpace && 
+          r.status !== 'Cancelado'
+        ) {
           const rStart = parseTime(r.startTime);
           const rEnd = parseTime(r.endTime);
           return (newStart < rEnd && newEnd > rStart);
@@ -227,23 +245,35 @@ export const ReservationDrawer: React.FC<
      *
      * "2026-09-30"
      */
-    addReservation({
-      spaceName: space.name,
-      date,
-      startTime,
-      endTime,
-      guestsCount,
-      fee,
-      isExempt: fee === 0,
-      status: 'Confirmado',
-      userUnit:
-        currentUser?.unit ||
-        'Unidade',
-      userName:
-        currentUser?.name ||
-        'Morador',
-      notes
-    });
+    if (editingReservation) {
+      updateReservation(editingReservation.id, {
+        date,
+        startTime,
+        endTime,
+        guestsCount,
+        fee,
+        isExempt: fee === 0,
+        notes
+      });
+    } else {
+      addReservation({
+        spaceName: space.name,
+        date,
+        startTime,
+        endTime,
+        guestsCount,
+        fee,
+        isExempt: fee === 0,
+        status: 'Confirmado',
+        userUnit:
+          currentUser?.unit ||
+          'Unidade',
+        userName:
+          currentUser?.name ||
+          'Morador',
+        notes
+      });
+    }
 
     onClose();
   };
@@ -261,7 +291,7 @@ export const ReservationDrawer: React.FC<
 
             <div>
               <h3 className="font-bold text-sm leading-tight">
-                Solicitar Reserva de Espaço
+                {editingReservation ? 'Editar Horário da Reserva' : 'Solicitar Reserva de Espaço'}
               </h3>
 
               <p className="text-[11px] text-[#86f2e4]">
@@ -317,12 +347,13 @@ export const ReservationDrawer: React.FC<
               <input
                 type="date"
                 required
+                disabled={!!editingReservation}
                 value={date}
                 min={getLocalDateString()}
                 onChange={(e) =>
                   setDate(e.target.value)
                 }
-                className="w-full p-3 bg-[#eff4ff] border border-[#cbd5e1]/50 rounded-xl text-xs text-[#0b1c30] font-semibold focus:outline-none focus:ring-2 focus:ring-[#006a61]/30 transition-all"
+                className="w-full p-3 bg-[#eff4ff] border border-[#cbd5e1]/50 rounded-xl text-xs text-[#0b1c30] font-semibold focus:outline-none focus:ring-2 focus:ring-[#006a61]/30 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               />
             </div>
           </div>

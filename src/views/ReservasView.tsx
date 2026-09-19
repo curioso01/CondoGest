@@ -16,6 +16,7 @@ import {
 
 interface ReservasViewProps {
   onOpenBooking: (space: SpaceOption, selectedDate?: string) => void;
+  onEditBooking?: (res: import('../types').Reservation, space: SpaceOption) => void;
 }
 
 const MONTH_NAMES = [
@@ -603,35 +604,51 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => {
-                    const newCount = prompt(
-                      'Digite o novo número de convidados:',
-                      String(res.guestsCount)
-                    );
+                {res.userName === currentUser?.name && (
+                  <>
+                    <button
+                      onClick={() => {
+                        const newCount = prompt(
+                          'Digite o novo número de convidados:',
+                          String(res.guestsCount)
+                        );
 
-                    if (newCount) {
-                      updateReservationGuests(
-                        res.id,
-                        parseInt(newCount, 10) ||
-                          res.guestsCount
-                      );
-                    }
-                  }}
-                  className="py-2 px-3 bg-[#eff4ff] hover:bg-[#dfeafc] text-xs font-bold text-[#0b1c30] rounded-xl border border-[#cbd5e1]/40 transition-colors"
-                >
-                  Editar Convidados
-                </button>
+                        if (newCount) {
+                          updateReservationGuests(
+                            res.id,
+                            parseInt(newCount, 10) ||
+                              res.guestsCount
+                          );
+                        }
+                      }}
+                      className="py-2 px-3 bg-[#eff4ff] hover:bg-[#dfeafc] text-xs font-bold text-[#0b1c30] rounded-xl border border-[#cbd5e1]/40 transition-colors"
+                    >
+                      Convidados
+                    </button>
 
-                {res.status === 'Confirmado' && (
-                  <button
-                    onClick={() =>
-                      cancelReservation(res.id)
-                    }
-                    className="py-2 px-3 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 rounded-xl border border-rose-200 transition-colors"
-                  >
-                    Cancelar Reserva
-                  </button>
+                    <button
+                      onClick={() => {
+                        const spaceObj = SPACES.find(s => s.name === res.spaceName);
+                        if (spaceObj && onEditBooking) {
+                          onEditBooking(res, spaceObj);
+                        }
+                      }}
+                      className="py-2 px-3 bg-[#eff4ff] hover:bg-[#dfeafc] text-xs font-bold text-[#0b1c30] rounded-xl border border-[#cbd5e1]/40 transition-colors"
+                    >
+                      Editar Horário
+                    </button>
+
+                    {res.status === 'Confirmado' && (
+                      <button
+                        onClick={() =>
+                          cancelReservation(res.id)
+                        }
+                        className="py-2 px-3 bg-rose-50 hover:bg-rose-100 text-xs font-bold text-rose-700 rounded-xl border border-rose-200 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </div>

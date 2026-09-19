@@ -21,6 +21,7 @@ interface CondoContextType {
   addReservation: (res: Omit<Reservation, 'id' | 'createdAt'>) => void;
   cancelReservation: (id: string) => void;
   updateReservationGuests: (id: string, newCount: number) => void;
+  updateReservation: (id: string, updated: Partial<Reservation>) => void;
   issueBatchBoletos: (options: { month: string; dueDate: string; baseFee: number; reserveFundPercent: number }) => void;
   payBoletoPix: (boletoId: string) => void;
   updateRules: (newRules: Partial<CondoRules>) => void;
@@ -222,6 +223,13 @@ export const CondoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     showToast(`Lista de convidados atualizada para ${newCount} pessoas.`);
   };
 
+  const updateReservation = (id: string, updated: Partial<Reservation>) => {
+    setReservations(prev =>
+      prev.map(r => (r.id === id ? { ...r, ...updated } : r))
+    );
+    showToast('Reserva atualizada com sucesso!');
+  };
+
   const issueBatchBoletos = (options: { month: string; dueDate: string; baseFee: number; reserveFundPercent: number }) => {
     const newBoleto: BoletoItem = {
       id: `bol-${Date.now()}`,
@@ -299,6 +307,7 @@ export const CondoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         addReservation,
         cancelReservation,
         updateReservationGuests,
+        updateReservation,
         issueBatchBoletos,
         payBoletoPix,
         updateRules,

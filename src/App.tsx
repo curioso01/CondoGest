@@ -31,6 +31,7 @@ const MainApp: React.FC = () => {
   const [activePixBoleto, setActivePixBoleto] = useState<BoletoItem | null>(null);
   const [bookingSpace, setBookingSpace] = useState<SpaceOption | null>(null);
   const [bookingDate, setBookingDate] = useState<string | undefined>(undefined);
+  const [editingReservation, setEditingReservation] = useState<Reservation | null>(null);
   const [isTicketOpen, setIsTicketOpen] = useState(false);
   const [isVisitorPassOpen, setIsVisitorPassOpen] = useState(false);
 
@@ -57,6 +58,10 @@ const MainApp: React.FC = () => {
             onOpenBooking={(space, date) => {
               setBookingSpace(space);
               setBookingDate(date);
+            }}
+            onEditBooking={(res, space) => {
+              setEditingReservation(res);
+              setBookingSpace(space);
             }}
           />
         );
@@ -156,9 +161,11 @@ const MainApp: React.FC = () => {
           <ReservationDrawer
             space={bookingSpace}
             selectedDate={bookingDate}
+            editingReservation={editingReservation}
             onClose={() => {
               setBookingSpace(null);
               setBookingDate(undefined);
+              setEditingReservation(null);
             }}
           />
         )}
@@ -231,9 +238,11 @@ const MainApp: React.FC = () => {
         <ReservationDrawer
           space={bookingSpace}
           selectedDate={bookingDate}
+          editingReservation={editingReservation}
           onClose={() => {
             setBookingSpace(null);
             setBookingDate(undefined);
+            setEditingReservation(null);
           }}
         />
       )}
