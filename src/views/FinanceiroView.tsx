@@ -23,8 +23,16 @@ interface FinanceiroViewProps {
 }
 
 export const FinanceiroView: React.FC<FinanceiroViewProps> = ({ onOpenPixModal }) => {
-  const { currentUser, boletos, showToast, deviceMode } = useCondo();
+  const { currentUser, boletos, showToast, deviceMode, globalSearch } = useCondo();
   const isMobile = deviceMode === 'mobile';
+  
+  const filteredBoletos = boletos.filter(b => {
+    return !globalSearch || 
+      b.reference.toLowerCase().includes(globalSearch.toLowerCase()) || 
+      b.status.toLowerCase().includes(globalSearch.toLowerCase()) ||
+      b.amount.toString().includes(globalSearch);
+  });
+  
   const [selectedBoleto, setSelectedBoleto] = useState<BoletoItem>(boletos[0]);
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -326,7 +334,7 @@ export const FinanceiroView: React.FC<FinanceiroViewProps> = ({ onOpenPixModal }
           </div>
 
           <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-            {boletos.map((b) => (
+            {filteredBoletos.map((b) => (
               <div
                 key={b.id}
                 onClick={() => setSelectedBoleto(b)}

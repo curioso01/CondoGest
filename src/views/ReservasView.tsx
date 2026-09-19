@@ -95,7 +95,8 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
     cancelReservation,
     updateReservationGuests,
     showToast,
-    deviceMode
+    deviceMode,
+    globalSearch
   } = useCondo();
 
   const isMobile = deviceMode === 'mobile';
@@ -204,7 +205,13 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
           (s) => s.id === selectedSpaceFilter
         );
 
-  const myReservations = reservations.filter(res => res.userName === currentUser?.name);
+  const myReservations = reservations.filter(res => {
+    const matchesUser = res.userName === currentUser?.name;
+    const matchesSearch = !globalSearch || 
+      res.spaceName.toLowerCase().includes(globalSearch.toLowerCase()) || 
+      res.date.includes(globalSearch);
+    return matchesUser && matchesSearch;
+  });
 
   const sixtyDaysFromNow = new Date(today);
   sixtyDaysFromNow.setDate(today.getDate() + 60);
@@ -212,7 +219,12 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
   const maxDateStr = formatDateForInput(sixtyDaysFromNow.getFullYear(), sixtyDaysFromNow.getMonth(), sixtyDaysFromNow.getDate());
 
   const upcomingReservations = reservations.filter(res => {
-    return res.date >= todayStrFilter && res.date <= maxDateStr;
+    const inRange = res.date >= todayStrFilter && res.date <= maxDateStr;
+    const matchesSearch = !globalSearch || 
+      res.spaceName.toLowerCase().includes(globalSearch.toLowerCase()) || 
+      res.userName.toLowerCase().includes(globalSearch.toLowerCase()) ||
+      res.date.includes(globalSearch);
+    return inRange && matchesSearch;
   });
   upcomingReservations.sort((a, b) => a.date.localeCompare(b.date));
 

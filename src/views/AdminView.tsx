@@ -44,7 +44,8 @@ export const AdminView: React.FC = () => {
     updateRules, 
     showToast,
     deviceMode,
-    setActiveTab
+    setActiveTab,
+    globalSearch
   } = useCondo();
 
   const isMobile = deviceMode === 'mobile';
@@ -111,16 +112,24 @@ export const AdminView: React.FC = () => {
 
   // Filtered residents list
   const filteredUsers = users.filter((u) => {
-    const matchesSearch = 
-      u.name.toLowerCase().includes(residentSearch.toLowerCase()) ||
-      u.apartment.toLowerCase().includes(residentSearch.toLowerCase()) ||
-      (u.carPlate && u.carPlate.toLowerCase().includes(residentSearch.toLowerCase())) ||
-      (u.tagCode && u.tagCode.toLowerCase().includes(residentSearch.toLowerCase()));
+    const combinedSearch = (residentSearch || '') + ' ' + (globalSearch || '');
+    const matchesSearch = !combinedSearch.trim() || 
+      u.name.toLowerCase().includes(combinedSearch.toLowerCase()) ||
+      u.apartment.toLowerCase().includes(combinedSearch.toLowerCase()) ||
+      (u.carPlate && u.carPlate.toLowerCase().includes(combinedSearch.toLowerCase())) ||
+      (u.tagCode && u.tagCode.toLowerCase().includes(combinedSearch.toLowerCase()));
 
     const matchesBlock = blockFilter === 'Todos' || u.block === blockFilter;
     const matchesStatus = statusFilter === 'Todos' || u.financialStatus === statusFilter;
 
     return matchesSearch && matchesBlock && matchesStatus;
+  });
+
+  const filteredNotices = notices.filter(n => {
+    return !globalSearch || 
+      n.title.toLowerCase().includes(globalSearch.toLowerCase()) || 
+      n.body.toLowerCase().includes(globalSearch.toLowerCase()) ||
+      n.category.toLowerCase().includes(globalSearch.toLowerCase());
   });
 
   const handleCreateUser = (e: React.FormEvent) => {
@@ -742,7 +751,7 @@ export const AdminView: React.FC = () => {
             </div>
 
             <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-              {notices.map((n) => (
+              {filteredNotices.map((n) => (
                 <div
                   key={n.id}
                   className="p-3.5 rounded-xl bg-[#eff4ff] border border-[#cbd5e1]/40 space-y-1.5"
