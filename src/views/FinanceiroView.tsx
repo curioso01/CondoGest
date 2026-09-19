@@ -23,7 +23,8 @@ interface FinanceiroViewProps {
 }
 
 export const FinanceiroView: React.FC<FinanceiroViewProps> = ({ onOpenPixModal }) => {
-  const { boletos, showToast } = useCondo();
+  const { currentUser, boletos, showToast, deviceMode } = useCondo();
+  const isMobile = deviceMode === 'mobile';
   const [selectedBoleto, setSelectedBoleto] = useState<BoletoItem>(boletos[0]);
   const [copiedCode, setCopiedCode] = useState(false);
 
@@ -45,8 +46,8 @@ export const FinanceiroView: React.FC<FinanceiroViewProps> = ({ onOpenPixModal }
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Top Banner */}
-      <div className="bg-white p-5 lg:p-6 rounded-2xl border border-[#e2e8f0]/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Top Welcome Banner */}
+      <div className={`bg-white p-5 lg:p-6 rounded-2xl border border-[#e2e8f0]/80 shadow-xs flex flex-col ${!isMobile ? 'md:flex-row md:items-center' : ''} justify-between gap-4`}>
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#006a61] flex items-center gap-1 mb-1">
             <Sparkles className="w-3.5 h-3.5" />
@@ -69,10 +70,10 @@ export const FinanceiroView: React.FC<FinanceiroViewProps> = ({ onOpenPixModal }
         </button>
       </div>
 
-      {/* Destaque: Cota Vigente e PIX */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Boleto Card */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-xs flex flex-col justify-between">
+      {/* Main Content Grid */}
+      <div className={`grid grid-cols-1 ${!isMobile ? 'lg:grid-cols-3' : ''} gap-6`}>
+        {/* Left Column: Current Boleto */}
+        <div className={`${!isMobile ? 'lg:col-span-2' : ''} bg-white rounded-2xl border border-[#e2e8f0] p-6 shadow-xs flex flex-col justify-between`}>
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-[#eff4ff]">
               <div>
@@ -278,8 +279,8 @@ export const FinanceiroView: React.FC<FinanceiroViewProps> = ({ onOpenPixModal }
         </div>
       </div>
 
-      {/* Balancetes Assinados em PDF & Histórico de 12 Meses */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Balancetes Assinados em      {/* Histórico e Demonstrativo em Duas Colunas */}
+      <div className={`grid grid-cols-1 ${!isMobile ? 'lg:grid-cols-2' : ''} gap-6`}>
         {/* Balancetes Mensais Assinados */}
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-[#eff4ff]">

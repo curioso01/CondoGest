@@ -34,7 +34,8 @@ export const MuralView: React.FC<MuralViewProps> = ({
   onOpenTicket,
   onGoToReservas
 }) => {
-  const { currentUser, notices, boletos, reservations, globalSearch, updateReservationGuests, showToast } = useCondo();
+  const { currentUser, notices, boletos, reservations, globalSearch, updateReservationGuests, showToast, deviceMode } = useCondo();
+  const isMobile = deviceMode === 'mobile';
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
   const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
 
@@ -65,7 +66,7 @@ export const MuralView: React.FC<MuralViewProps> = ({
   return (
     <div className="space-y-6 pb-12">
       {/* Top Welcome Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 lg:p-6 rounded-2xl border border-[#e2e8f0]/80 shadow-xs">
+      <div className={`flex flex-col ${!isMobile ? 'md:flex-row md:items-center' : ''} justify-between gap-4 bg-white p-5 lg:p-6 rounded-2xl border border-[#e2e8f0]/80 shadow-xs`}>
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-bold uppercase tracking-wider text-[#006a61] flex items-center gap-1">
@@ -132,7 +133,7 @@ export const MuralView: React.FC<MuralViewProps> = ({
       </div>
 
       {/* Dual Cards: Próxima Reserva & Boleto Vigente */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={`grid grid-cols-1 ${!isMobile ? 'lg:grid-cols-2' : ''} gap-6`}>
         {/* Card 1: Próxima Reserva Ativa */}
         <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5 lg:p-6 shadow-xs flex flex-col justify-between">
           <div>
@@ -306,7 +307,7 @@ export const MuralView: React.FC<MuralViewProps> = ({
 
       {/* Mural de Avisos da Síndica */}
       <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5 lg:p-6 shadow-xs space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#eff4ff]">
+        <div className={`flex flex-col ${!isMobile ? 'sm:flex-row sm:items-center' : ''} justify-between gap-3 pb-3 border-b border-[#eff4ff]`}>
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-[#006a61]" />
             <div>
@@ -334,7 +335,7 @@ export const MuralView: React.FC<MuralViewProps> = ({
         </div>
 
         {/* Notices Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className={`grid grid-cols-1 ${!isMobile ? 'md:grid-cols-2' : ''} gap-4`}>
           {filteredNotices.map((notice) => {
             const isUrgent = notice.category === 'Urgente';
             const isReg = notice.category === 'Regimento';
@@ -389,9 +390,9 @@ export const MuralView: React.FC<MuralViewProps> = ({
       </div>
 
       {/* Regras de Convivência & Ocupação da Semana */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className={`grid grid-cols-1 ${!isMobile ? 'lg:grid-cols-3' : ''} gap-6`}>
         {/* Timeline dos Próximos 7 Dias */}
-        <div className="lg:col-span-2 bg-white rounded-2xl border border-[#e2e8f0] p-5 shadow-xs">
+        <div className={`${!isMobile ? 'lg:col-span-2' : ''} bg-white rounded-2xl border border-[#e2e8f0] p-5 shadow-xs`}>
           <div className="flex items-center justify-between mb-3 pb-2 border-b border-[#eff4ff]">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-[#006a61]" />

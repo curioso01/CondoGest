@@ -94,8 +94,11 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
     reservations,
     cancelReservation,
     updateReservationGuests,
-    showToast
+    showToast,
+    deviceMode
   } = useCondo();
+
+  const isMobile = deviceMode === 'mobile';
 
   const [selectedSpaceFilter, setSelectedSpaceFilter] =
     useState<string>('all');
@@ -216,7 +219,7 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
   return (
     <div className="space-y-6 pb-12">
       {/* Top Banner */}
-      <div className="bg-white p-5 lg:p-6 rounded-2xl border border-[#e2e8f0]/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className={`bg-white p-5 lg:p-6 rounded-2xl border border-[#e2e8f0]/80 shadow-xs flex flex-col ${!isMobile ? 'md:flex-row md:items-center' : ''} justify-between gap-4`}>
         <div>
           <span className="text-xs font-bold uppercase tracking-wider text-[#006a61] flex items-center gap-1 mb-1">
             <Sparkles className="w-3.5 h-3.5" />
@@ -251,7 +254,8 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          {/* SPACES SUMMARY (Desktop row, Mobile grid) */}
+        <div className={`grid grid-cols-1 ${!isMobile ? 'sm:grid-cols-2 lg:grid-cols-4' : ''} gap-3 text-xs`}>
           <div className="bg-white p-3 rounded-xl border border-[#cbd5e1]/40">
             <span className="font-bold text-[#0b1c30] block mb-0.5">
               Duração Máxima:
@@ -328,7 +332,8 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          {/* Listagem (2 colunas no desktop) */}
+        <div className={`grid grid-cols-1 ${!isMobile ? 'md:grid-cols-2 lg:grid-cols-2' : ''} gap-6`}>
           {filteredSpaces.map((space) => (
             <div
               key={space.id}

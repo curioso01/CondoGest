@@ -35,12 +35,18 @@ export const AdminView: React.FC = () => {
     updateUser, 
     deleteUser, 
     notices, 
+    reservations, 
+    boletos, 
+    tickets,
     addNotice, 
     issueBatchBoletos, 
     rules, 
     updateRules, 
-    showToast 
+    showToast,
+    deviceMode
   } = useCondo();
+
+  const isMobile = deviceMode === 'mobile';
 
   const [currentAdminTab, setCurrentAdminTab] = useState<'moradores' | 'boletos' | 'avisos' | 'regras'>('moradores');
 
@@ -237,8 +243,8 @@ export const AdminView: React.FC = () => {
         </div>
       </div>
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Indicadores Principais (Cards) */}
+      <div className={`grid grid-cols-2 ${!isMobile ? 'lg:grid-cols-4' : ''} gap-4`}>
         <div className="bg-white p-4 rounded-xl border border-[#e2e8f0] shadow-xs">
           <span className="text-xs font-semibold text-[#76777d]">Total de Unidades</span>
           <div className="flex items-baseline gap-2 mt-1">
@@ -378,7 +384,7 @@ export const AdminView: React.FC = () => {
             {filteredUsers.map((resident) => (
               <div
                 key={resident.id}
-                className="p-4 rounded-xl border border-[#e2e8f0] bg-white hover:border-[#006a61]/40 transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+                className={`p-4 rounded-xl border border-[#e2e8f0] bg-white hover:border-[#006a61]/40 transition-all flex flex-col ${!isMobile ? 'lg:flex-row lg:items-center' : ''} justify-between gap-4`}
               >
                 <div className="flex items-start sm:items-center gap-3.5">
                   <img
@@ -426,8 +432,8 @@ export const AdminView: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Resident Action Buttons */}
-                <div className="flex items-center gap-2 self-end lg:self-center">
+                {/* Ações */}
+                <div className={`flex items-center gap-2 self-end ${!isMobile ? 'lg:self-center' : ''}`}>
                   {resident.financialStatus === 'Pendente' && (
                     <button
                       onClick={() => showToast(`Notificação de cobrança amigável enviada para ${resident.email}`, 'info')}
