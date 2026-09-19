@@ -34,10 +34,9 @@ export const MuralView: React.FC<MuralViewProps> = ({
   onOpenTicket,
   onGoToReservas
 }) => {
-  const { currentUser, notices, boletos, reservations, globalSearch, updateReservationGuests, showToast, deviceMode } = useCondo();
+  const { currentUser, notices, boletos, reservations, globalSearch, updateReservationGuests, showToast, deviceMode, selectedNotice, setSelectedNotice } = useCondo();
   const isMobile = deviceMode === 'mobile';
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
-  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
 
   // Latest boleto for user
   const latestBoleto = boletos[0] || {

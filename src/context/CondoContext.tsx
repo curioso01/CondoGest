@@ -12,6 +12,8 @@ interface CondoContextType {
   tickets: SupportTicket[];
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  selectedNotice: Notice | null;
+  setSelectedNotice: (notice: Notice | null) => void;
   loginUser: (user: UserProfile) => void;
   logout: () => void;
   addUser: (user: Omit<UserProfile, 'id'>) => void;
@@ -110,6 +112,7 @@ export const CondoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   ]);
 
   const [activeTab, setActiveTab] = useState<string>('inicio');
+  const [selectedNotice, setSelectedNotice] = useState<Notice | null>(null);
   const [deviceMode, setDeviceMode] = useState<'auto' | 'mobile' | 'desktop'>('auto');
   const [globalSearch, setGlobalSearch] = useState<string>('');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' | 'error' } | null>(null);
@@ -311,6 +314,8 @@ export const CondoProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         tickets,
         activeTab,
         setActiveTab,
+        selectedNotice,
+        setSelectedNotice,
         loginUser,
         logout,
         addUser,

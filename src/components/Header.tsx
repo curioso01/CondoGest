@@ -24,7 +24,8 @@ export const Header: React.FC = () => {
     deviceMode,
     setDeviceMode,
     notices,
-    setActiveTab
+    setActiveTab,
+    setSelectedNotice
   } = useCondo();
 
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -128,6 +129,7 @@ export const Header: React.FC = () => {
                       onClick={() => {
                         setShowNotifications(false);
                         setActiveTab('inicio');
+                        setSelectedNotice(notice);
                       }}
                       className="p-2.5 rounded-lg hover:bg-[#eff4ff] cursor-pointer transition-colors border-l-3 border-[#006a61]"
                     >
