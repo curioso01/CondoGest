@@ -199,6 +199,18 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
           (s) => s.id === selectedSpaceFilter
         );
 
+  const myReservations = reservations.filter(res => res.userName === currentUser?.name);
+
+  const sixtyDaysFromNow = new Date(today);
+  sixtyDaysFromNow.setDate(today.getDate() + 60);
+  const todayStrFilter = formatDateForInput(today.getFullYear(), today.getMonth(), today.getDate());
+  const maxDateStr = formatDateForInput(sixtyDaysFromNow.getFullYear(), sixtyDaysFromNow.getMonth(), sixtyDaysFromNow.getDate());
+
+  const upcomingReservations = reservations.filter(res => {
+    return res.date >= todayStrFilter && res.date <= maxDateStr;
+  });
+  upcomingReservations.sort((a, b) => a.date.localeCompare(b.date));
+
   return (
     <div className="space-y-6 pb-12">
       {/* Top Banner */}
@@ -555,12 +567,12 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
           </div>
 
           <span className="text-xs font-bold text-[#006a61] bg-[#eff4ff] px-3 py-1 rounded-full border border-[#cbd5e1]/40">
-            {reservations.length} agendamentos registrados
+            {myReservations.length} agendamentos registrados
           </span>
         </div>
 
         <div className="space-y-3">
-          {reservations.map((res) => (
+          {myReservations.map((res) => (
             <div
               key={res.id}
               className="p-4 rounded-xl border border-[#e2e8f0] bg-white hover:border-[#006a61]/30 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -655,6 +667,68 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
               </div>
             </div>
           ))}
+          {myReservations.length === 0 && (
+            <div className="text-center py-6 text-sm text-[#76777d]">
+              Você ainda não possui nenhuma reserva agendada.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Próximas Reservas (Geral) */}
+      <div className="bg-white rounded-2xl border border-[#e2e8f0] p-5 lg:p-6 shadow-xs space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#eff4ff]">
+          <div>
+            <h3 className="font-extrabold text-base text-[#0b1c30]">
+              Grade Geral de Reservas (Próximos 60 Dias)
+            </h3>
+            <p className="text-xs text-[#76777d]">
+              Acompanhe a agenda do condomínio e veja quem reservou os espaços
+            </p>
+          </div>
+          <span className="text-xs font-bold text-[#0b1c30] bg-[#f8f9ff] px-3 py-1 rounded-full border border-[#cbd5e1]/40">
+            {upcomingReservations.length} ocupações programadas
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          {upcomingReservations.map((res) => (
+            <div
+              key={`upcoming-${res.id}`}
+              className="p-4 rounded-xl border border-[#e2e8f0] bg-[#f8f9ff]/50 flex flex-col gap-2"
+            >
+              <div className="flex items-center gap-2">
+                <span className="font-extrabold text-sm text-[#0b1c30]">
+                  {res.spaceName}
+                </span>
+                <span
+                  className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                    res.status === 'Confirmado'
+                      ? 'bg-emerald-100 text-emerald-800'
+                      : 'bg-rose-100 text-rose-800'
+                  }`}
+                >
+                  {res.status}
+                </span>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 text-xs text-[#45464d]">
+                <span className="flex items-center gap-1 font-semibold text-[#006a61]">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {res.date} ({res.startTime} às {res.endTime})
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  Reservado por: <span className="font-bold">{res.userName}</span>
+                </span>
+              </div>
+            </div>
+          ))}
+          {upcomingReservations.length === 0 && (
+            <div className="text-center py-6 text-sm text-[#76777d]">
+              Nenhuma reserva programada para os próximos 60 dias.
+            </div>
+          )}
         </div>
       </div>
     </div>
