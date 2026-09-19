@@ -83,7 +83,7 @@ export const ReservationDrawer: React.FC<
    * Caso contrário, usamos a data padrão D+2.
    */
   const [date, setDate] = useState<string>(
-    selectedDate || getDefaultReservationDate()
+    selectedDate || ''
   );
 
   const [startTime, setStartTime] =

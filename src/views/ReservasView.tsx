@@ -470,13 +470,16 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
 
           {daysArray.map((day) => {
             const info = getDayStatus(day);
-            const isClickable = info.status !== 'occupied';
-
+            
             const selectedDate = formatDateForInput(
               currentYear,
               currentMonth,
               day
             );
+
+            const todayStr = formatDateForInput(today.getFullYear(), today.getMonth(), today.getDate());
+            const isPast = selectedDate < todayStr;
+            const isClickable = info.status !== 'occupied' && !isPast;
 
             return (
               <button
@@ -495,14 +498,23 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
                       selectedDate
                     );
                   } else {
-                    showToast(
-                      `Dia ${day} de ${MONTH_NAMES[currentMonth]} já possui ocupação máxima nas áreas comuns.`,
-                      'info'
-                    );
+                    if (isPast) {
+                      showToast(
+                        `Não é possível fazer agendamentos em datas passadas.`,
+                        'error'
+                      );
+                    } else {
+                      showToast(
+                        `Dia ${day} de ${MONTH_NAMES[currentMonth]} já possui ocupação máxima nas áreas comuns.`,
+                        'info'
+                      );
+                    }
                   }
                 }}
                 className={`p-2 sm:p-3 rounded-xl border flex flex-col items-center justify-between transition-all min-h-[56px] sm:min-h-[70px] ${
-                  info.status === 'occupied'
+                  isPast 
+                    ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed opacity-60'
+                    : info.status === 'occupied'
                     ? 'bg-rose-50/70 border-rose-200 text-rose-800'
                     : info.status === 'partial'
                     ? 'bg-amber-50/70 border-amber-200 text-amber-900 hover:scale-105'

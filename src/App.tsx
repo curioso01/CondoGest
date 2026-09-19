@@ -30,6 +30,7 @@ const MainApp: React.FC = () => {
   // Modals state
   const [activePixBoleto, setActivePixBoleto] = useState<BoletoItem | null>(null);
   const [bookingSpace, setBookingSpace] = useState<SpaceOption | null>(null);
+  const [bookingDate, setBookingDate] = useState<string | undefined>(undefined);
   const [isTicketOpen, setIsTicketOpen] = useState(false);
   const [isVisitorPassOpen, setIsVisitorPassOpen] = useState(false);
 
@@ -53,7 +54,10 @@ const MainApp: React.FC = () => {
       case 'reservas':
         return (
           <ReservasView
-            onOpenBooking={(space) => setBookingSpace(space)}
+            onOpenBooking={(space, date) => {
+              setBookingSpace(space);
+              setBookingDate(date);
+            }}
           />
         );
       case 'boletos':
@@ -151,7 +155,11 @@ const MainApp: React.FC = () => {
         {bookingSpace && (
           <ReservationDrawer
             space={bookingSpace}
-            onClose={() => setBookingSpace(null)}
+            selectedDate={bookingDate}
+            onClose={() => {
+              setBookingSpace(null);
+              setBookingDate(undefined);
+            }}
           />
         )}
         {isTicketOpen && (
@@ -182,7 +190,7 @@ const MainApp: React.FC = () => {
 
         {/* Dynamic Toast Message */}
         {toast && (
-          <div className="fixed top-20 right-4 lg:right-8 z-50 animate-in slide-in-from-top duration-300">
+          <div className="fixed top-20 right-4 lg:right-8 z-[100] animate-in slide-in-from-top duration-300">
             <div className={`p-3.5 rounded-xl shadow-lg border text-xs font-bold flex items-center gap-2.5 max-w-sm ${
               toast.type === 'error'
                 ? 'bg-rose-50 border-rose-200 text-rose-800'
@@ -222,7 +230,11 @@ const MainApp: React.FC = () => {
       {bookingSpace && (
         <ReservationDrawer
           space={bookingSpace}
-          onClose={() => setBookingSpace(null)}
+          selectedDate={bookingDate}
+          onClose={() => {
+            setBookingSpace(null);
+            setBookingDate(undefined);
+          }}
         />
       )}
 
