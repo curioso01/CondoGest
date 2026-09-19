@@ -86,9 +86,11 @@ const formatDateForInput = (
 };
 
 export const ReservasView: React.FC<ReservasViewProps> = ({
-  onOpenBooking
+  onOpenBooking,
+  onEditBooking
 }) => {
   const {
+    currentUser,
     reservations,
     cancelReservation,
     updateReservationGuests,
