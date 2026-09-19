@@ -157,7 +157,9 @@ export const ReservasView: React.FC<ReservasViewProps> = ({
 
     const parseTime = (timeStr: string) => {
       const [h, m] = timeStr.split(':').map(String);
-      return parseInt(h, 10) + (parseInt(m, 10) / 60);
+      let num = parseInt(h, 10) + (parseInt(m, 10) / 60);
+      if (num === 0) num = 24;
+      return num;
     };
 
     let totalReservedHours = 0;

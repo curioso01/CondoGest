@@ -116,24 +116,38 @@ export const ReservationDrawer: React.FC<
 
   if (!space) return null;
 
-  // Calculate duration in hours.
-  const startHour = parseInt(
-    startTime.split(':')[0],
-    10
-  );
+  const parseTime = (timeStr: string) => {
+    const [h, m] = timeStr.split(':').map(Number);
+    return h + ((m || 0) / 60);
+  };
 
-  const endHour = parseInt(
-    endTime.split(':')[0],
-    10
-  );
+  const startNum = parseTime(startTime);
+  let endNum = parseTime(endTime);
+  if (endNum === 0) endNum = 24;
 
-  const duration =
-    endHour >= startHour
-      ? endHour - startHour
-      : 24 - startHour + endHour;
+  const duration = endNum > startNum ? endNum - startNum : 0; // If end < start, it's invalid unless crossing midnight (handled later)
+  const isOverDuration = duration > 6 || duration <= 0;
 
-  const isOverDuration =
-    duration > 6;
+  const isTimeOutOfRange = () => {
+    if (!date) return false;
+    const dateObj = new Date(date + 'T12:00:00');
+    const dayOfWeek = dateObj.getDay();
+    const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+
+    if (startNum < 7) return true; // Antes das 7h
+    
+    if (isWeekend) {
+      if (endNum > 24) return true;
+    } else {
+      if (endNum > 22) return true; // Durante a semana até 22h
+    }
+
+    if (endNum <= startNum) return true; // Horário inválido (término antes ou igual ao início)
+
+    return false;
+  };
+
+  const outOfRange = isTimeOutOfRange();
 
   // Fee calculation.
   let fee = 0;
@@ -176,28 +190,31 @@ export const ReservationDrawer: React.FC<
   ) => {
     e.preventDefault();
 
-    if (isOverDuration) {
+    if (isOverDuration || outOfRange) {
       return;
     }
 
-    const parseTime = (timeStr: string) => {
-      const [h, m] = timeStr.split(':').map(Number);
-      return h + (m / 60);
+    const doSpacesConflict = (nameA: string, nameB: string) => {
+      if (nameA === nameB) return true;
+      const exclusiveSpaces = ['Combo Área Completa (Salão + 2 Churrasqueiras)', 'Salão de Festas Principal'];
+      if (exclusiveSpaces.includes(nameA) || exclusiveSpaces.includes(nameB)) return true;
+      return false;
     };
 
     const getConflictingReservation = (targetSpace: string) => {
-      const newStart = parseTime(startTime);
-      const newEnd = parseTime(endTime);
+      const newStart = startNum;
+      const newEnd = endNum;
       
       return reservations.find(r => {
         if (
           r.id !== editingReservation?.id &&
           r.date === date && 
-          r.spaceName === targetSpace && 
-          r.status !== 'Cancelado'
+          r.status !== 'Cancelado' &&
+          doSpacesConflict(targetSpace, r.spaceName)
         ) {
           const rStart = parseTime(r.startTime);
-          const rEnd = parseTime(r.endTime);
+          let rEnd = parseTime(r.endTime);
+          if (rEnd === 0) rEnd = 24;
           return (newStart < rEnd && newEnd > rStart);
         }
         return false;
@@ -365,45 +382,16 @@ export const ReservationDrawer: React.FC<
                 Horário Início
               </label>
 
-              <select
+              <input
+                type="time"
+                step="900"
+                required
                 value={startTime}
                 onChange={(e) =>
                   setStartTime(e.target.value)
                 }
                 className="w-full p-3 bg-[#eff4ff] border border-[#cbd5e1]/50 rounded-xl text-xs text-[#0b1c30] font-semibold focus:outline-none focus:ring-2 focus:ring-[#006a61]/30 transition-all"
-              >
-                <option value="09:00">
-                  09:00
-                </option>
-
-                <option value="10:00">
-                  10:00
-                </option>
-
-                <option value="11:00">
-                  11:00
-                </option>
-
-                <option value="12:00">
-                  12:00 (Almoço)
-                </option>
-
-                <option value="13:00">
-                  13:00
-                </option>
-
-                <option value="14:00">
-                  14:00
-                </option>
-
-                <option value="17:00">
-                  17:00
-                </option>
-
-                <option value="18:00">
-                  18:00 (Jantar)
-                </option>
-              </select>
+              />
             </div>
 
             <div>
@@ -411,52 +399,23 @@ export const ReservationDrawer: React.FC<
                 Horário Término
               </label>
 
-              <select
+              <input
+                type="time"
+                step="900"
+                required
                 value={endTime}
                 onChange={(e) =>
                   setEndTime(e.target.value)
                 }
                 className="w-full p-3 bg-[#eff4ff] border border-[#cbd5e1]/50 rounded-xl text-xs text-[#0b1c30] font-semibold focus:outline-none focus:ring-2 focus:ring-[#006a61]/30 transition-all"
-              >
-                <option value="15:00">
-                  15:00
-                </option>
-
-                <option value="16:00">
-                  16:00
-                </option>
-
-                <option value="17:00">
-                  17:00
-                </option>
-
-                <option value="18:00">
-                  18:00
-                </option>
-
-                <option value="20:00">
-                  20:00
-                </option>
-
-                <option value="22:00">
-                  22:00 (Seg-Sex máx)
-                </option>
-
-                <option value="23:30">
-                  23:30
-                </option>
-
-                <option value="00:00">
-                  00:00 (Sáb-Dom máx)
-                </option>
-              </select>
+              />
             </div>
           </div>
 
           {/* Duration Indicator */}
           <div
             className={`p-3 rounded-xl border flex items-center gap-2 text-xs ${
-              isOverDuration
+              isOverDuration || outOfRange
                 ? 'bg-rose-50 border-rose-200 text-rose-700 font-bold'
                 : 'bg-[#eff4ff] border-[#cbd5e1]/40 text-[#45464d]'
             }`}
@@ -464,13 +423,22 @@ export const ReservationDrawer: React.FC<
             <Clock className="w-4 h-4 shrink-0 text-[#006a61]" />
 
             <span>
-              Duração estimada:{' '}
-              <strong>
-                {duration} horas
-              </strong>{' '}
-              {isOverDuration
-                ? '(Excede o limite regimental de 6 horas!)'
-                : '(Permitido)'}
+              {!outOfRange ? (
+                <>
+                  Duração estimada:{' '}
+                  <strong>
+                    {duration % 1 !== 0 ? duration.toFixed(2).replace('.', ':') : duration} horas
+                  </strong>{' '}
+                  {isOverDuration
+                    ? '(Excede o limite regimental de 6 horas!)'
+                    : '(Permitido)'}
+                </>
+              ) : (
+                <>
+                  <strong>Horário Não Permitido:</strong>{' '}
+                  {startNum < 7 ? 'Reservas iniciam às 07:00.' : endNum <= startNum ? 'Horário de término deve ser posterior ao início.' : 'Limite até 22h (Seg-Qui) ou 00h (Sex-Sáb).'}
+                </>
+              )}
             </span>
           </div>
 
